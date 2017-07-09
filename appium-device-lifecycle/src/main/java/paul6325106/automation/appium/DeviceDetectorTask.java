@@ -1,5 +1,7 @@
 package paul6325106.automation.appium;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import paul6325106.automation.device.DeviceDetector;
 
 import java.time.Duration;
@@ -11,24 +13,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class DeviceDetectorTask implements Callable<Void> {
 
+    private final Logger LOG = LoggerFactory.getLogger(DeviceDetectorTask.class);
+
     private final static long DELAY = Duration.ofSeconds(30).toMillis();
 
     private final DeviceDetector deviceDetector;
     private final HashMap<String, AtomicBoolean> deviceConnectedMap;
-    private final AtomicBoolean isStopRequested;
 
-    DeviceDetectorTask(final DeviceDetector deviceDetector, final Map<String, AtomicBoolean> deviceConnectedMap,
-            final AtomicBoolean isStopRequested) {
-
+    DeviceDetectorTask(final DeviceDetector deviceDetector, final Map<String, AtomicBoolean> deviceConnectedMap) {
         this.deviceDetector = deviceDetector;
         this.deviceConnectedMap = new HashMap<>(deviceConnectedMap);
-        this.isStopRequested = isStopRequested;
     }
 
     @Override
     public Void call() throws Exception {
         try {
-            while (!isStopRequested.get()) {
+            while (!Thread.currentThread().isInterrupted()) {
                 final List<String> connectedDeviceIds = deviceDetector.getConnectedDeviceIds();
 
                 for (final Map.Entry<String, AtomicBoolean> entry : deviceConnectedMap.entrySet()) {
@@ -39,8 +39,9 @@ class DeviceDetectorTask implements Callable<Void> {
 
                 Thread.sleep(DELAY);
             }
+        } catch (final InterruptedException ignored) {
         } catch (final Exception e) {
-            isStopRequested.set(true);
+            LOG.error("Error occurred during device detection", e);
             throw e;
         }
 

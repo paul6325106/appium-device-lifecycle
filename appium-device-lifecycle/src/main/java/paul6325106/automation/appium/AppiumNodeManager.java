@@ -1,50 +1,41 @@
 package paul6325106.automation.appium;
 
 import io.appium.java_client.service.local.AppiumDriverLocalService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import paul6325106.automation.device.AdbDetector;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class AppiumNodeManager {
 
-    public static void main(final String[] args) throws Exception {
-        final List<Callable<Void>> tasks = getTasks(getAppiumPropertiesList(args));
+    private final Logger LOG = LoggerFactory.getLogger(AppiumNodeManager.class);
 
-        final List<Future<Void>> futures = Executors.newFixedThreadPool(tasks.size()).invokeAll(tasks);
+    private final List<AppiumProperties> appiumPropertiesList;
+    private final Lock lock;
 
-        for (final Future<Void> future : futures) {
-            try {
-                future.get();
-            } catch (final ExecutionException e) {
-                if (e.getCause() instanceof IOException) {
-                    throw new IOException("Unable to query connection status of devices", e.getCause());
-                } else {
-                    throw e;
-                }
-            }
-        }
+    private ExecutorService executorService;
+    private boolean isStarted;
+
+    public AppiumNodeManager(final List<AppiumProperties> appiumPropertiesList) {
+        this.appiumPropertiesList = appiumPropertiesList;
+        this.isStarted = false;
+        this.lock = new ReentrantLock(true);
     }
 
-    private static List<AppiumProperties> getAppiumPropertiesList(final String[] args) {
-        // TODO
-        return null;
-    }
-
-    private static List<Callable<Void>> getTasks(final List<AppiumProperties> appiumPropertiesList) {
+    private List<Callable<Void>> getTasks(final List<AppiumProperties> appiumPropertiesList) {
         final AppiumDriverLocalServiceFactory factory = new AppiumDriverLocalServiceFactory();
 
         final Map<String, AtomicBoolean> deviceConnectedMap = new HashMap<>();
-
-        final AtomicBoolean isStopRequested = new AtomicBoolean(false);
 
         final List<Callable<Void>> tasks = new ArrayList<>();
 
@@ -55,12 +46,58 @@ public class AppiumNodeManager {
 
             deviceConnectedMap.put(appiumProperties.getDeviceId(), isDeviceConnected);
 
-            tasks.add(new AppiumDriverLocalServiceTask(service, isDeviceConnected, isStopRequested));
+            tasks.add(new AppiumDriverLocalServiceTask(service, isDeviceConnected));
         }
 
-        tasks.add(new DeviceDetectorTask(new AdbDetector(), deviceConnectedMap, isStopRequested));
+        tasks.add(new DeviceDetectorTask(new AdbDetector(), deviceConnectedMap));
 
         return tasks;
+    }
+
+    public void start() {
+        lock.lock();
+        try {
+            if (isStarted) {
+                return;
+            }
+
+            LOG.info("Starting Appium node manager");
+
+            final List<Callable<Void>> tasks = getTasks(appiumPropertiesList);
+
+            executorService = Executors.newFixedThreadPool(tasks.size());
+
+            for (final Callable<Void> task : tasks) {
+                executorService.submit(task);
+            }
+
+            isStarted = true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean isRunning() {
+        lock.lock();
+        try {
+            // TODO any checking of threads status?
+            return isStarted && !executorService.isShutdown();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void stop() {
+        lock.lock();
+        try {
+            if (isStarted) {
+                LOG.info("Stopping Appium node manager");
+                executorService.shutdownNow();
+            }
+        } finally {
+            isStarted = false;
+            lock.unlock();
+        }
     }
 
 }

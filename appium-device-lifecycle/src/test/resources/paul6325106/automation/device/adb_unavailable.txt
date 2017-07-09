@@ -1,0 +1,1 @@
+bash: abd: command not found

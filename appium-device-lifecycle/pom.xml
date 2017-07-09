@@ -12,7 +12,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <selenium-version>3.4.0</selenium-version>
-        <appium.version>5.0.0-BETA9</appium.version>
+        <appium.version>4.1.2</appium.version>
     </properties>
 
     <dependencies>
@@ -26,16 +26,51 @@
             <artifactId>java-client</artifactId>
             <version>${appium.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
     </dependencies>
 
     <profiles>
         <profile>
             <id>selenium-grid</id>
-            <!-- TODO -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>paul6325106/automation/selenium/**</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>appium-nodes</id>
-            <!-- TODO -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>paul6325106/automation/appium/**</include>
+                                <include>paul6325106/automation/device/**</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

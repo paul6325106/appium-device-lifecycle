@@ -6,16 +6,21 @@ import io.appium.java_client.service.local.AppiumServiceBuilder;
 import static io.appium.java_client.service.local.flags.AndroidServerFlag.*;
 import static io.appium.java_client.service.local.flags.GeneralServerFlag.*;
 
-public class AppiumDriverLocalServiceFactory {
+class AppiumDriverLocalServiceFactory {
 
-    public AppiumDriverLocalService buildAndroidService(final AppiumProperties appiumProperties) {
-        return new AppiumServiceBuilder()
+    AppiumDriverLocalService buildAndroidService(final AppiumProperties appiumProperties) {
+        final AppiumServiceBuilder builder = new AppiumServiceBuilder()
+                .withArgument(LOG_LEVEL, "warn")
                 .withArgument(CONFIGURATION_FILE, appiumProperties.getNodeConfig())
                 .usingPort(appiumProperties.getPort())
                 .withArgument(BOOTSTRAP_PORT_NUMBER, String.valueOf(appiumProperties.getBootstrapPort()))
-                .withArgument(CHROME_DRIVER_PORT, String.valueOf(appiumProperties.getChromeDriverPort()))
-                .withArgument(SESSION_OVERRIDE, String.valueOf(appiumProperties.isSessionOverride()))
-                .build();
+                .withArgument(CHROME_DRIVER_PORT, String.valueOf(appiumProperties.getChromeDriverPort()));
+
+        if (appiumProperties.isSessionOverride()) {
+            builder.withArgument(SESSION_OVERRIDE);
+        }
+
+        return builder.build();
     }
 
 }

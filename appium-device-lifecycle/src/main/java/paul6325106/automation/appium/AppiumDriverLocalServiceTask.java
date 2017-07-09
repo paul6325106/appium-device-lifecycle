@@ -1,6 +1,8 @@
 package paul6325106.automation.appium;
 
 import io.appium.java_client.service.local.AppiumDriverLocalService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -8,24 +10,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class AppiumDriverLocalServiceTask implements Callable<Void> {
 
+    private final Logger LOG = LoggerFactory.getLogger(AppiumDriverLocalServiceTask.class);
+
     private final static long DELAY = Duration.ofSeconds(30).toMillis();
 
     private final AppiumDriverLocalService service;
     private final AtomicBoolean isDeviceConnected;
-    private final AtomicBoolean isStopRequested;
 
-    AppiumDriverLocalServiceTask(final AppiumDriverLocalService service, final AtomicBoolean isDeviceConnected,
-            final AtomicBoolean isStopRequested) {
-
+    AppiumDriverLocalServiceTask(final AppiumDriverLocalService service, final AtomicBoolean isDeviceConnected) {
         this.service = service;
         this.isDeviceConnected = isDeviceConnected;
-        this.isStopRequested = isStopRequested;
     }
 
     @Override
     public Void call() throws Exception {
+        // TODO somewhat concerned about service start/stop blocking on interrupt
+
         try {
-            while (!isStopRequested.get()) {
+            while (!Thread.currentThread().isInterrupted()) {
 
                 // query once per iteration
                 final boolean isDeviceConnected = this.isDeviceConnected.get();
@@ -33,15 +35,18 @@ class AppiumDriverLocalServiceTask implements Callable<Void> {
 
                 // appium has its own internal lock for starting/stopping
                 if (isServiceRunning && !isDeviceConnected) {
+                    LOG.info("Stopping Appium node {}", service.getUrl());
                     service.stop();
                 } else if (!isServiceRunning && isDeviceConnected) {
+                    LOG.info("Starting Appium node {}", service.getUrl());
                     service.start();
                 }
 
                 Thread.sleep(DELAY);
             }
+        } catch (final InterruptedException ignored) {
         } catch (final Exception e) {
-            isStopRequested.set(true);
+            LOG.error("Error occurred during Appium service management", e);
             throw e;
         } finally {
             if (service.isRunning()) {
