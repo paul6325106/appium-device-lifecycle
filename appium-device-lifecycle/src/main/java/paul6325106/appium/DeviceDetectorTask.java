@@ -1,8 +1,8 @@
-package paul6325106.automation.appium;
+package paul6325106.appium;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import paul6325106.automation.device.DeviceDetector;
+import paul6325106.device.DeviceDetector;
 
 import java.time.Duration;
 import java.util.HashMap;

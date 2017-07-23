@@ -1,4 +1,4 @@
-package paul6325106.automation.appium;
+package paul6325106.appium;
 
 public class AppiumProperties {
 

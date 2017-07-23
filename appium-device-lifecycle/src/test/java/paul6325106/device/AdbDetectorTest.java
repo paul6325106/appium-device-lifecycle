@@ -1,4 +1,4 @@
-package paul6325106.automation.device;
+package paul6325106.device;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,7 +19,7 @@ public class AdbDetectorTest {
 
     @Test
     public void testAdbUnavailable() throws Exception {
-        final String filename = "/paul6325106/automation/device/adb_unavailable.txt";
+        final String filename = "/paul6325106/device/adb_unavailable.txt";
         final InputStream resourceAsStream = this.getClass().getResourceAsStream(filename);
 
         try {
@@ -31,7 +31,7 @@ public class AdbDetectorTest {
 
     @Test
     public void testAdbWithoutDevices() throws Exception {
-        final String filename = "/paul6325106/automation/device/adb_empty.txt";
+        final String filename = "/paul6325106/device/adb_empty.txt";
         final InputStream resourceAsStream = this.getClass().getResourceAsStream(filename);
 
         final List<String> connectedDeviceIds = detector.getConnectedDeviceIds(resourceAsStream);
@@ -40,7 +40,7 @@ public class AdbDetectorTest {
 
     @Test
     public void testAdbWithDevices() throws Exception {
-        final String filename = "/paul6325106/automation/device/adb_multiple.txt";
+        final String filename = "/paul6325106/device/adb_multiple.txt";
         final InputStream resourceAsStream = this.getClass().getResourceAsStream(filename);
 
         final List<String> connectedDeviceIds = detector.getConnectedDeviceIds(resourceAsStream);

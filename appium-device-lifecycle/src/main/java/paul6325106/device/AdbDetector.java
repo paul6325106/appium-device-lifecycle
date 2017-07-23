@@ -1,4 +1,4 @@
-package paul6325106.automation.device;
+package paul6325106.device;
 
 import java.io.BufferedReader;
 import java.io.IOException;

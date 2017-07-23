@@ -1,9 +1,9 @@
-package paul6325106.automation.appium;
+package paul6325106.appium;
 
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import paul6325106.automation.device.AdbDetector;
+import paul6325106.device.AdbDetector;
 
 import java.util.ArrayList;
 import java.util.HashMap;

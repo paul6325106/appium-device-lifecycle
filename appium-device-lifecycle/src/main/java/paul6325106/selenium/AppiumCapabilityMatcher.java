@@ -1,4 +1,4 @@
-package paul6325106.automation.selenium;
+package paul6325106.selenium;
 
 import static io.appium.java_client.remote.MobileCapabilityType.DEVICE_NAME;
 import static org.openqa.selenium.remote.CapabilityType.BROWSER_NAME;
