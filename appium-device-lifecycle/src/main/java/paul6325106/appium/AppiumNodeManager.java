@@ -49,6 +49,7 @@ public class AppiumNodeManager {
             tasks.add(new AppiumDriverLocalServiceTask(service, isDeviceConnected));
         }
 
+        // TODO enabling/disabling adb and xcode detectors
         tasks.add(new DeviceDetectorTask(new AdbDetector(), deviceConnectedMap));
 
         return tasks;

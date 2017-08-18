@@ -1,0 +1,22 @@
+Known Devices:
+Mac-Mini [F0607F9E-2422-37VC-C65R-6578113205G4]
+Name’s iPhone (10.2.1) [f19f8lllw1548v109a0v12aw7mb98910684q032a]
+Apple TV 1080p (10.1) [0989FB00-AS32-4C32-7Y5H-D149DV016553] (Simulator)
+Known Templates:
+"Activity Monitor"
+"Allocations"
+"Blank"
+"Cocoa Layout"
+"Core Animation"
+"Core Data"
+"Counters"
+"Energy Log"
+"File Activity"
+"Leaks"
+"Metal System Trace"
+"Network"
+"OpenGL ES Analysis"
+"System Trace"
+"System Usage"
+"Time Profiler"
+"Zombies"
